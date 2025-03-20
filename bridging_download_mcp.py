@@ -26,9 +26,9 @@ def main():
     signal.signal(signal.SIGTERM, handle_termination)
 
     try:
-        # Get current script directory
+        # 获取当前脚本所在目录
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        # Build path to dist/index.js
+        # 构建 dist/index.js 的路径
         index_js_path = os.path.join(current_dir, 'dist', 'index.js')
         
         proc = subprocess.Popen(

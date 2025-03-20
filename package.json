@@ -8,7 +8,9 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "dev": "ts-node-dev --respawn src/index.ts",
-    "test": "jest"
+    "test": "jest",
+    "register": "cursor tool register download-mcp -p dist/index.js",
+    "unregister": "cursor tool unregister download-mcp"
   },
   "keywords": [
     "mcp",
@@ -22,11 +24,13 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.6.1",
     "@types/node": "^20.0.0",
+    "@types/node-fetch": "^2.6.12",
     "axios": "^1.6.8",
     "dotenv": "^16.0.3",
+    "node-fetch": "^2.7.0",
+    "node-windows": "^1.0.0-beta.8",
     "typescript": "^5.0.0",
-    "zod": "^3.22.4",
-    "node-windows": "^1.0.0-beta.8"
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "ts-node": "^10.9.1",

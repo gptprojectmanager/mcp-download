@@ -20,4 +20,17 @@ process.on('SIGTERM', async () => {
   console.log('正在关闭下载MCP服务...');
   await downloadMCP.close();
   process.exit(0);
-}); 
+});
+
+// 处理未捕获的异常，避免崩溃
+process.on('uncaughtException', (err) => {
+  console.error('未捕获的异常:', err);
+  // 不退出进程，保持下载服务运行
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('未处理的Promise拒绝:', reason);
+  // 不退出进程，保持下载服务运行
+});
+
+console.log('下载MCP服务已启动'); 

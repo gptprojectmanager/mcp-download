@@ -38,11 +38,18 @@ export class DownloadMCP {
       {
         url: z.string(),
         filename: z.string().optional(),
-        savePath: z.string().optional()
+        savePath: z.string().optional(),
+        threads: z.number().min(1).max(32).optional(),
+        isBlocking: z.boolean().optional(),
+        isPersistent: z.boolean().optional()
       },
-      async ({ url, filename, savePath }) => {
+      async ({ url, filename, savePath, threads, isBlocking, isPersistent }) => {
         try {
-          const task = await this.downloadService.startDownload(url, filename, savePath);
+          const task = await this.downloadService.startDownload(url, filename, savePath, {
+            threads,
+            isBlocking,
+            isPersistent
+          });
           return {
             content: [{
               type: "text",
@@ -104,6 +111,43 @@ export class DownloadMCP {
       }
     );
 
+    // 暂停下载任务
+    this.server.tool(
+      "pauseDownload",
+      {
+        taskId: z.string()
+      },
+      ({ taskId }) => {
+        const success = this.downloadService.pauseTask(taskId);
+        return {
+          content: [{
+            type: "text",
+            text: success ? "任务已暂停" : "任务暂停失败或任务不存在"
+          }],
+          isError: !success
+        };
+      }
+    );
+
+    // 恢复下载任务
+    this.server.tool(
+      "resumeDownload",
+      {
+        taskId: z.string(),
+        threads: z.number().min(1).max(32).optional()
+      },
+      ({ taskId, threads }) => {
+        const success = this.downloadService.resumeTask(taskId, { threads });
+        return {
+          content: [{
+            type: "text",
+            text: success ? "任务已恢复" : "任务恢复失败或任务不存在"
+          }],
+          isError: !success
+        };
+      }
+    );
+
     // 取消下载任务
     this.server.tool(
       "cancelDownload",
@@ -147,7 +191,11 @@ export class DownloadMCP {
       ? `${this.formatSize(task.downloadedSize)} / ${this.formatSize(task.totalSize)}`
       : this.formatSize(task.downloadedSize);
     const durationText = this.formatDuration(task.startTime, task.endTime);
-    
+    const speedText = task.speed > 0 
+      ? this.formatSpeed(task.speed)
+      : "等待中";
+
+    // 基本信息
     let text = [
       `任务ID: ${task.id}`,
       `文件名: ${task.filename}`,
@@ -155,9 +203,27 @@ export class DownloadMCP {
       `状态: ${statusText}`,
       `进度: ${task.progress}%`,
       `大小: ${sizeText}`,
+      `速度: ${speedText}`,
       `用时: ${durationText}`
     ];
     
+    // 附加信息（如果有）
+    if (task.segments) {
+      text.push(`线程数: ${task.segments.length}`);
+    }
+    
+    if (task.isBlocking !== undefined || task.isPersistent !== undefined) {
+      const modeText = [];
+      if (task.isBlocking !== undefined) {
+        modeText.push(task.isBlocking ? '阻塞' : '非阻塞');
+      }
+      if (task.isPersistent !== undefined) {
+        modeText.push(task.isPersistent ? '持久化' : '非持久化');
+      }
+      text.push(`模式: ${modeText.join(', ')}`);
+    }
+    
+    // 错误信息（如果有）
     if (task.error) {
       text.push(`错误: ${task.error}`);
     }
@@ -174,7 +240,8 @@ export class DownloadMCP {
       [DownloadStatus.DOWNLOADING]: '下载中',
       [DownloadStatus.COMPLETED]: '已完成',
       [DownloadStatus.FAILED]: '失败',
-      [DownloadStatus.CANCELLED]: '已取消'
+      [DownloadStatus.CANCELLED]: '已取消',
+      [DownloadStatus.PAUSED]: '已暂停'
     };
     return statusMap[status];
   }
@@ -193,6 +260,22 @@ export class DownloadMCP {
     }
     
     return `${size.toFixed(2)} ${units[unitIndex]}`;
+  }
+
+  /**
+   * 格式化速度
+   */
+  private formatSpeed(bytesPerSecond: number): string {
+    const units = ['B/s', 'KB/s', 'MB/s', 'GB/s'];
+    let speed = bytesPerSecond;
+    let unitIndex = 0;
+    
+    while (speed >= 1024 && unitIndex < units.length - 1) {
+      speed /= 1024;
+      unitIndex++;
+    }
+    
+    return `${speed.toFixed(2)} ${units[unitIndex]}`;
   }
 
   /**
@@ -229,6 +312,6 @@ export class DownloadMCP {
    */
   async close(): Promise<void> {
     // 清理资源
-    this.downloadService.cleanCompletedTasks();
+    this.downloadService.close();
   }
 } 
