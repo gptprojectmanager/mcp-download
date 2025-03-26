@@ -79,6 +79,7 @@ With simple natural language instructions, AI can help you complete all the abov
 git clone https://github.com/shuakami/mcp-download.git
 cd mcp-download
 npm install
+npm run build
 ```
 
 ### 2. Build the Project

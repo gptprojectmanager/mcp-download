@@ -79,6 +79,7 @@
 git clone https://github.com/shuakami/mcp-download.git
 cd mcp-download
 npm install
+npm run build
 ```
 
 ### 2. 构建项目
