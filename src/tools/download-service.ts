@@ -227,6 +227,14 @@ export class DownloadService {
     // 合并选项
     const downloadOptions = { ...this.defaultOptions, ...options };
     
+    // 验证保存路径
+    if (savePath) {
+      // 检查是否为绝对路径
+      if (!path.isAbsolute(savePath)) {
+        throw new Error('保存路径必须是绝对路径。请使用完整的路径（如 C:/Downloads/folder），或者不指定路径使用默认下载目录。');
+      }
+    }
+    
     // 生成任务ID
     const taskId = Math.random().toString(36).substring(2, 15);
     
