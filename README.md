@@ -97,7 +97,7 @@ Follow the steps below to configure MCP according to your operating system:
 1. In Cursor, open or create the MCP configuration file: `C:\\Users\\your_username\\.cursor\\mcp.json`
    - Note: Please replace `your_username` with your Windows username
 
-2. 添加或修改配置如下：
+2. Add or modify the configuration as follows:
 
 ```json
 {
@@ -105,7 +105,7 @@ Follow the steps below to configure MCP according to your operating system:
     "download-mcp": {
       "command": "python",
       "args": [
-        "C:/Users/你的用户名/mcp-download/bridging_download_mcp.py"
+        "C:/Users/your_username/mcp-download/bridging_download_mcp.py"
       ]
     }
   }
@@ -125,7 +125,7 @@ Follow the steps below to configure MCP according to your operating system:
 1. In Cursor, open or create the MCP configuration file: `/Users/your_username/.cursor/mcp.json`
    - Note: Please replace `your_username` with your macOS username
 
-2. 添加或修改配置如下：
+2. Add or modify the configuration as follows:
 
 ```json
 {
@@ -133,7 +133,7 @@ Follow the steps below to configure MCP according to your operating system:
     "download-mcp": {
       "command": "python3",
       "args": [
-        "/Users/你的用户名/mcp-download/bridging_download_mcp.py"
+        "/Users/your_username/mcp-download/bridging_download_mcp.py"
       ]
     }
   }
@@ -153,7 +153,7 @@ Follow the steps below to configure MCP according to your operating system:
 1. In Cursor, open or create the MCP configuration file: `/home/your_username/.cursor/mcp.json`
    - Note: Please replace `your_username` with your Linux username
 
-2. 添加或修改配置如下：
+2. Add or modify the configuration as follows:
 
 ```json
 {
@@ -161,7 +161,7 @@ Follow the steps below to configure MCP according to your operating system:
     "download-mcp": {
       "command": "python3",
       "args": [
-        "/home/你的用户名/mcp-download/bridging_download_mcp.py"
+        "/home/your_username/mcp-download/bridging_download_mcp.py"
       ]
     }
   }
