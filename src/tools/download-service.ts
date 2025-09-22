@@ -8,7 +8,7 @@ import { Response } from 'node-fetch';
 import cluster from 'cluster';
 import { EventEmitter } from 'events';
 
-// 下载任务状态
+// Download task status
 export enum DownloadStatus {
   PENDING = 'pending',
   DOWNLOADING = 'downloading',
@@ -18,7 +18,7 @@ export enum DownloadStatus {
   PAUSED = 'paused'
 }
 
-// 下载任务信息
+// Download task information
 export interface DownloadTask {
   id: string;
   url: string;
@@ -33,13 +33,13 @@ export interface DownloadTask {
   endTime?: Date;
   abortController?: AbortController;
   retryCount: number;
-  speed: number; // 下载速度，单位：bytes/s
-  segments?: DownloadSegment[]; // 多线程下载的段
-  isBlocking?: boolean; // 是否是阻塞式下载
-  isPersistent?: boolean; // 是否持久化（可在后台继续）
+  speed: number; // Download speed, unit: bytes/s
+  segments?: DownloadSegment[]; // Multi-threaded download segments
+  isBlocking?: boolean; // Whether it's a blocking download
+  isPersistent?: boolean; // Whether persistent (can continue in background)
 }
 
-// 下载段信息（用于多线程下载）
+// Download segment information (for multi-threaded download)
 export interface DownloadSegment {
   start: number;
   end: number;
@@ -47,16 +47,16 @@ export interface DownloadSegment {
   status: DownloadStatus;
 }
 
-// 下载设置
+// Download settings
 export interface DownloadOptions {
   maxRetries?: number;
   retryDelay?: number;
-  threads?: number; // 下载线程数
-  isBlocking?: boolean; // 是否阻塞当前线程
-  isPersistent?: boolean; // 是否在后台继续
+  threads?: number; // Number of download threads
+  isBlocking?: boolean; // Whether to block current thread
+  isPersistent?: boolean; // Whether to continue in background
 }
 
-// 全局事件发射器，用于在主进程和工作进程间通讯
+// Global event emitter for communication between main process and worker processes
 const globalEmitter = new EventEmitter();
 
 export class DownloadService {
@@ -64,7 +64,7 @@ export class DownloadService {
   private defaultDownloadDir: string;
   private defaultOptions: DownloadOptions;
   private speedUpdateInterval: NodeJS.Timeout | null = null;
-  private persistentTasks: Set<string>; // 存储持久化任务ID
+  private persistentTasks: Set<string>; // Store persistent task IDs
   private lastSpeedCalcTime: number = Date.now();
   private lastDownloadedSizes: Map<string, number> = new Map();
 
@@ -72,37 +72,37 @@ export class DownloadService {
     this.tasks = new Map();
     this.persistentTasks = new Set();
     
-    // 使用用户下载目录作为默认目录
+    // Use user download directory as default directory
     this.defaultDownloadDir = path.join(os.homedir(), 'Downloads', 'MCPDownloads');
     
-    // 默认下载设置
+    // Default download settings
     this.defaultOptions = {
       maxRetries: 3,
       retryDelay: 1000,
-      threads: 32, // 默认32线程下载
-      isBlocking: false, // 默认非阻塞
-      isPersistent: true // 默认持久化
+      threads: 32, // Default 32-thread download
+      isBlocking: false, // Default non-blocking
+      isPersistent: true // Default persistent
     };
     
-    // 确保下载目录存在
+    // Ensure download directory exists
     if (!fs.existsSync(this.defaultDownloadDir)) {
       fs.mkdirSync(this.defaultDownloadDir, { recursive: true });
     }
 
-    // 启动速度计算器
+    // Start speed calculator
     this.startSpeedCalculator();
 
-    // 如果是主进程，设置工作进程消息处理
+    // If it's the main process, set up worker process message handling
     if (cluster.isPrimary) {
       this.setupWorkerMessageHandling();
     }
 
-    // 尝试恢复持久化任务
+    // Try to restore persistent tasks
     this.restorePersistentTasks();
   }
 
   /**
-   * 设置工作进程消息处理
+   * Set up worker process message handling
    */
   private setupWorkerMessageHandling() {
     cluster.on('message', (worker, message) => {
@@ -120,7 +120,7 @@ export class DownloadService {
   }
 
   /**
-   * 恢复持久化任务
+   * Restore persistent tasks
    */
   private restorePersistentTasks() {
     try {
@@ -128,7 +128,7 @@ export class DownloadService {
       if (fs.existsSync(persistentTasksFile)) {
         const data = JSON.parse(fs.readFileSync(persistentTasksFile, 'utf8'));
         for (const taskData of data) {
-          // 恢复任务
+          // Restore task
           if (taskData.status === DownloadStatus.DOWNLOADING || taskData.status === DownloadStatus.PAUSED) {
             const task: DownloadTask = {
               ...taskData,
@@ -141,26 +141,26 @@ export class DownloadService {
             this.tasks.set(task.id, task);
             this.persistentTasks.add(task.id);
             
-            // 恢复下载
+            // Restore download
             if (task.status === DownloadStatus.DOWNLOADING) {
               this.executeDownload(task, {
                 threads: task.segments?.length || this.defaultOptions.threads,
                 isBlocking: false,
                 isPersistent: true
               }).catch(err => {
-                console.error(`恢复下载任务执行错误: ${err.message}`);
+                console.error(`Download task restore execution error: ${err.message}`);
               });
             }
           }
         }
       }
     } catch (error) {
-      console.error('恢复持久化任务失败:', error);
+      console.error('Failed to restore persistent tasks:', error);
     }
   }
 
   /**
-   * 保存持久化任务状态
+   * Save persistent task status
    */
   private savePersistentTasks() {
     try {
@@ -169,25 +169,25 @@ export class DownloadService {
         .map(taskId => this.tasks.get(taskId))
         .filter(Boolean)
         .map(task => {
-          // 排除不需要序列化的属性
+          // Exclude properties that don't need serialization
           const { abortController, ...serializableTask } = task as any;
           return serializableTask;
         });
       
       fs.writeFileSync(persistentTasksFile, JSON.stringify(persistentTasksData, null, 2));
     } catch (error) {
-      console.error('保存持久化任务失败:', error);
+      console.error('Failed to save persistent tasks:', error);
     }
   }
 
   /**
-   * 启动速度计算器
+   * Start speed calculator
    */
   private startSpeedCalculator() {
-    // 每秒计算一次下载速度
+    // Calculate download speed once per second
     this.speedUpdateInterval = setInterval(() => {
       const now = Date.now();
-      const timeDiff = (now - this.lastSpeedCalcTime) / 1000; // 转换为秒
+      const timeDiff = (now - this.lastSpeedCalcTime) / 1000; // Convert to seconds
       
       for (const [taskId, task] of this.tasks.entries()) {
         if (task.status === DownloadStatus.DOWNLOADING) {
@@ -195,7 +195,7 @@ export class DownloadService {
           const currentSize = task.downloadedSize;
           const bytesPerSecond = (currentSize - lastSize) / timeDiff;
           
-          // 使用简单的移动平均来平滑速度显示
+          // Use simple moving average to smooth speed display
           task.speed = Math.round(bytesPerSecond);
           this.lastDownloadedSizes.set(taskId, currentSize);
         }
@@ -203,7 +203,7 @@ export class DownloadService {
       
       this.lastSpeedCalcTime = now;
       
-      // 保存持久化任务状态
+      // Save persistent task status
       if (this.persistentTasks.size > 0) {
         this.savePersistentTasks();
       }
@@ -211,7 +211,7 @@ export class DownloadService {
   }
 
   /**
-   * 清理速度计算器
+   * Clear speed calculator
    */
   private stopSpeedCalculator() {
     if (this.speedUpdateInterval) {
@@ -221,35 +221,35 @@ export class DownloadService {
   }
 
   /**
-   * 开始下载任务
+   * Start download task
    */
   async startDownload(url: string, filename?: string, savePath?: string, options?: DownloadOptions): Promise<DownloadTask> {
     // 合并选项
     const downloadOptions = { ...this.defaultOptions, ...options };
     
-    // 验证保存路径
+    // Validate save path
     if (savePath) {
-      // 检查是否为绝对路径
+      // Check if it's an absolute path
       if (!path.isAbsolute(savePath)) {
-        throw new Error('保存路径必须是绝对路径。请使用完整的路径（如 C:/Downloads/folder），或者不指定路径使用默认下载目录。');
+        throw new Error('Save path must be an absolute path. Please use a complete path (like C:/Downloads/folder), or don\'t specify a path to use the default download directory.');
       }
     }
     
-    // 生成任务ID
+    // Generate task ID
     const taskId = Math.random().toString(36).substring(2, 15);
     
-    // 确定文件名
+    // Determine filename
     const finalFilename = filename || this.getFilenameFromUrl(url);
     
-    // 确定保存路径
+    // Determine save path
     const finalSavePath = savePath || this.defaultDownloadDir;
     
-    // 确保保存路径存在
+    // Ensure save path exists
     if (!fs.existsSync(finalSavePath)) {
       fs.mkdirSync(finalSavePath, { recursive: true });
     }
     
-    // 创建任务
+    // Create task
     const task: DownloadTask = {
       id: taskId,
       url,
@@ -267,19 +267,19 @@ export class DownloadService {
     
     this.tasks.set(taskId, task);
     
-    // 如果是持久化任务，添加到持久化集合
+    // If it's a persistent task, add to persistent collection
     if (task.isPersistent) {
       this.persistentTasks.add(taskId);
     }
     
-    // 开始下载
+    // Start download
     if (downloadOptions.isBlocking) {
-      // 阻塞式下载，等待完成
+      // Blocking download, wait for completion
       await this.executeDownload(task, downloadOptions);
     } else {
-      // 非阻塞式下载，不等待完成
+      // Non-blocking download, don't wait for completion
       this.executeDownload(task, downloadOptions).catch(err => {
-        console.error(`下载任务执行错误: ${err.message}`);
+        console.error(`Download task execution error: ${err.message}`);
       });
     }
     
@@ -287,7 +287,7 @@ export class DownloadService {
   }
   
   /**
-   * 检查是否支持多线程下载
+   * Check if multi-threaded download is supported
    */
   private async checkMultiThreadSupport(url: string): Promise<{supported: boolean, contentLength?: number}> {
     try {
@@ -306,56 +306,56 @@ export class DownloadService {
         contentLength: contentLength ? parseInt(contentLength, 10) : undefined
       };
     } catch (error) {
-      console.error('检查多线程支持时出错:', error);
+      console.error('Error checking multi-thread support:', error);
       return { supported: false };
     }
   }
   
   /**
-   * 执行下载操作
+   * Execute download operation
    */
   private async executeDownload(task: DownloadTask, options: DownloadOptions): Promise<void> {
-    // 设置中止控制器
+    // Set abort controller
     task.abortController = new AbortController();
     task.status = DownloadStatus.DOWNLOADING;
     
     try {
-      // 检查是否支持多线程下载
+      // Check if multi-threaded download is supported
       const { supported: supportsMultiThread, contentLength } = await this.checkMultiThreadSupport(task.url);
       
-      // 设置总文件大小
+      // Set total file size
       if (contentLength) {
         task.totalSize = contentLength;
       }
       
-      // 准备文件路径
+      // Prepare file path
       const filePath = path.join(task.savePath, task.filename);
       
-      // 如果支持多线程下载并且文件大小足够大，使用多线程下载
+      // If multi-threaded download is supported and file size is large enough, use multi-threaded download
       if (supportsMultiThread && contentLength && contentLength > 1024 * 1024 && options.threads && options.threads > 1) {
         await this.executeMultiThreadDownload(task, filePath, contentLength, options.threads);
       } else {
-        // 不支持多线程或文件太小，使用单线程下载
+        // Doesn't support multi-threading or file too small, use single-threaded download
         await this.executeSingleThreadDownload(task, filePath);
       }
       
-      // 更新任务状态为完成
+      // Update task status to completed
       task.status = DownloadStatus.COMPLETED;
       task.progress = 100;
       task.endTime = new Date();
       
-      // 如果是持久化任务，从持久化集合中移除
+      // If it's a persistent task, remove from persistent collection
       if (this.persistentTasks.has(task.id)) {
         this.persistentTasks.delete(task.id);
         this.savePersistentTasks();
       }
       
     } catch (error: unknown) {
-      // 处理中止情况
+      // Handle abort situation
       const err = error as Error;
       if (err.name === 'AbortError') {
         task.status = DownloadStatus.CANCELLED;
-        task.error = '下载已取消';
+        task.error = 'Download cancelled';
       } else {
         // 处理其他错误，尝试重试
         console.error(`下载错误 (${task.url}):`, err);
@@ -658,7 +658,7 @@ export class DownloadService {
       task.status = DownloadStatus.CANCELLED;
       task.endTime = new Date();
       
-      // 如果是持久化任务，从持久化集合中移除
+      // If it's a persistent task, remove from persistent collection
       if (this.persistentTasks.has(taskId)) {
         this.persistentTasks.delete(taskId);
         this.savePersistentTasks();

@@ -1,4 +1,4 @@
-# Download MCP 工具
+# Download MCP Tool
 
 [![ISC License](https://img.shields.io/badge/License-ISC-3a86ff?style=flat-square)](https://opensource.org/licenses/ISC)
 [![Node.js](https://img.shields.io/badge/Node.js-18.x-ff006e?style=flat-square)](https://nodejs.org/)
@@ -7,40 +7,40 @@
 
 [English Version (README-EN.md)](README-EN.md)
 
-## 这是什么
+## What is this
 
-这是一个基于 MCP (Model Context Protocol) 的下载工具，它能让 AI 模型通过标准化接口管理文件下载任务。
+This is a download tool based on MCP (Model Context Protocol) that allows AI models to manage file download tasks through a standardized interface.
 
-简单来说，它让 AI 助手能够执行各种下载操作，如启动多线程下载、监控下载进度、管理下载任务等，无需用户手动输入复杂的命令或切换到其他下载工具。
+Simply put, it allows AI assistants to perform various download operations, such as starting multi-threaded downloads, monitoring download progress, managing download tasks, etc., without requiring users to manually input complex commands or switch to other download tools.
 
 <details>
-<summary><b>支持的功能</b> (点击展开)</summary>
+<summary><b>Supported Features</b> (click to expand)</summary>
 
-- **下载文件**：自动创建多线程下载任务，支持断点续传
-- **任务管理**：列出、获取、暂停、恢复、取消和清理下载任务
-- **多线程下载**：支持多达32线程并行下载，显著提升下载速度
-- **持久化功能**：下载任务可在后台持续运行，即使关闭前台程序
-- **状态监控**：实时跟踪下载进度、速度和耗时
-- **灵活配置**：支持阻塞/非阻塞、持久化/非持久化等多种模式
+- **Download Files**: Automatically create multi-threaded download tasks with resume support
+- **Task Management**: List, get, pause, resume, cancel and clean download tasks
+- **Multi-threaded Download**: Support up to 32 parallel download threads, significantly improving download speed
+- **Persistence Feature**: Download tasks can continue running in the background, even if the frontend program is closed
+- **Status Monitoring**: Real-time tracking of download progress, speed and elapsed time
+- **Flexible Configuration**: Support for blocking/non-blocking, persistent/non-persistent and other modes
 </details>
 
 <details>
-<summary><b>功能特点</b> (点击展开)</summary>
+<summary><b>Feature Highlights</b> (click to expand)</summary>
 
-以下是 Download MCP 工具的一些核心特点：
+Here are some core features of the Download MCP tool:
 
-- **极速多线程下载**：最高支持32线程并行下载，大幅提升下载速度
-- **智能断点续传**：自动检测中断的下载并从断点处继续
-- **持久化下载任务**：即使关闭前台进程，下载任务也会在后台继续
-- **实时状态监控**：提供下载速度、进度、剩余时间等实时信息
-- **灵活的工作模式**：支持阻塞式或非阻塞式下载，根据需求选择
-- **完整的任务管理**：创建、暂停、恢复、取消和清理下载任务的全流程管理
-- **智能错误处理**：自动重试失败的下载，确保下载成功率
+- **Ultra-fast Multi-threaded Download**: Support up to 32 parallel download threads, dramatically improving download speed
+- **Smart Resume Support**: Automatically detect interrupted downloads and continue from breakpoints
+- **Persistent Download Tasks**: Download tasks continue in the background even when the frontend process is closed
+- **Real-time Status Monitoring**: Provides real-time information on download speed, progress, remaining time, etc.
+- **Flexible Working Modes**: Support blocking or non-blocking downloads, choose according to your needs
+- **Complete Task Management**: Full workflow management for creating, pausing, resuming, cancelling and cleaning download tasks
+- **Smart Error Handling**: Automatically retry failed downloads to ensure download success rate
 
-通过简单的自然语言指令，AI 可以帮助你完成上述所有操作，无需手动编写复杂命令或使用专门的下载软件。
+Through simple natural language commands, AI can help you complete all the above operations without manually writing complex commands or using specialized download software.
 </details>
 
-## 快速上手
+## Quick Start
 
 ### 0. 环境准备
 

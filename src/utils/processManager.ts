@@ -1,22 +1,22 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-// 锁文件路径配置
+// Lock file path configuration
 const LOCK_FILE = path.join(process.cwd(), '.mcp-download.lock');
 
 export class ProcessManager {
   private instanceId: string;
 
   constructor() {
-    // 生成唯一实例ID
+    // Generate unique instance ID
     this.instanceId = Date.now().toString();
     
-    // 注册进程退出处理
+    // Register process exit handler
     this.registerCleanup();
   }
 
   private registerCleanup(): void {
-    // 注册多个信号以确保清理
+    // Register multiple signals to ensure cleanup
     process.on('SIGINT', () => this.cleanup());
     process.on('SIGTERM', () => this.cleanup());
     process.on('exit', () => this.cleanup());
@@ -26,14 +26,14 @@ export class ProcessManager {
     try {
       if (fs.existsSync(LOCK_FILE)) {
         const lockData = JSON.parse(fs.readFileSync(LOCK_FILE, 'utf8'));
-        // 只清理自己的锁文件
+        // Only clean up own lock file
         if (lockData.instanceId === this.instanceId) {
           fs.unlinkSync(LOCK_FILE);
-          console.log('已清理锁文件');
+          console.log('Lock file cleaned up');
         }
       }
     } catch (error) {
-      console.error('清理锁文件时出错:', error);
+      console.error('Error cleaning up lock file:', error);
     }
   }
 
@@ -44,11 +44,11 @@ export class ProcessManager {
     while (attempts < maxAttempts) {
       try {
         process.kill(pid, 0);
-        // 如果进程还在运行，等待100ms
+        // If process is still running, wait 100ms
         await new Promise(resolve => setTimeout(resolve, 100));
         attempts++;
       } catch (e) {
-        // 进程已经退出
+        // Process has already exited
         return;
       }
     }
@@ -56,25 +56,25 @@ export class ProcessManager {
 
   public async checkAndCreateLock(): Promise<boolean> {
     try {
-      // 检查锁文件是否存在
+      // Check if lock file exists
       if (fs.existsSync(LOCK_FILE)) {
         const lockData = JSON.parse(fs.readFileSync(LOCK_FILE, 'utf8'));
         
         try {
-          // 检查进程是否还在运行
+          // Check if process is still running
           process.kill(lockData.pid, 0);
-          console.log('检测到已有MCP下载服务实例正在运行，正在请求其退出...');
-          // 向已有进程发送终止信号
+          console.log('Detected existing MCP download service instance running, requesting its exit...');
+          // Send termination signal to existing process
           process.kill(lockData.pid, 'SIGTERM');
-          // 等待旧进程退出
+          // Wait for old process to exit
           await this.waitForProcessEnd(lockData.pid);
         } catch (e) {
-          // 进程不存在，可以继续
-          console.log('检测到过期的锁文件，将创建新的实例');
+          // Process doesn't exist, can continue
+          console.log('Detected expired lock file, will create new instance');
         }
       }
 
-      // 创建新的锁文件
+      // Create new lock file
       fs.writeFileSync(LOCK_FILE, JSON.stringify({
         pid: process.pid,
         instanceId: this.instanceId,
@@ -83,7 +83,7 @@ export class ProcessManager {
 
       return true;
     } catch (error) {
-      console.error('处理锁文件时出错:', error);
+      console.error('Error handling lock file:', error);
       return false;
     }
   }

@@ -4,52 +4,52 @@ import { DownloadMCP } from './tools/download.js';
 import { config } from 'dotenv';
 import { ProcessManager } from './utils/processManager.js';
 
-// 加载环境变量
+// Load environment variables
 config();
 
-// 创建进程管理器
+// Create process manager
 const processManager = new ProcessManager();
 
-// 主函数
+// Main function
 async function main() {
-  // 检查进程互斥
+  // Check process mutex
   if (!await processManager.checkAndCreateLock()) {
-    console.error('无法创建锁文件，程序退出');
+    console.error('Unable to create lock file, program exiting');
     process.exit(1);
   }
 
-  // 实例化下载MCP
+  // Instantiate download MCP
   const downloadMCP = new DownloadMCP();
 
-  // 处理进程退出
+  // Handle process exit
   process.on('SIGINT', async () => {
-    console.log('正在关闭下载MCP服务...');
+    console.log('Shutting down download MCP service...');
     await downloadMCP.close();
     process.exit(0);
   });
 
   process.on('SIGTERM', async () => {
-    console.log('正在关闭下载MCP服务...');
+    console.log('Shutting down download MCP service...');
     await downloadMCP.close();
     process.exit(0);
   });
 
-  // 处理未捕获的异常，避免崩溃
+  // Handle uncaught exceptions to avoid crashes
   process.on('uncaughtException', (err) => {
-    console.error('未捕获的异常:', err);
-    // 不退出进程，保持下载服务运行
+    console.error('Uncaught exception:', err);
+    // Don't exit process, keep download service running
   });
 
   process.on('unhandledRejection', (reason, promise) => {
-    console.error('未处理的Promise拒绝:', reason);
-    // 不退出进程，保持下载服务运行
+    console.error('Unhandled Promise rejection:', reason);
+    // Don't exit process, keep download service running
   });
 
-  console.log('下载MCP服务已启动');
+  console.log('Download MCP service started');
 }
 
-// 启动程序
+// Start program
 main().catch(error => {
-  console.error('程序启动失败:', error);
+  console.error('Program startup failed:', error);
   process.exit(1);
 });

@@ -9,30 +9,30 @@ export class DownloadMCP {
   private downloadService: DownloadService;
 
   constructor() {
-    // 初始化下载服务
+    // Initialize download service
     this.downloadService = new DownloadService();
 
-    // 初始化MCP服务器
+    // Initialize MCP server
     this.server = new McpServer({
       name: "download-mcp",
       version: "1.0.0"
     });
 
-    // 注册工具
+    // Register tools
     this.registerTools();
 
-    // 连接到标准输入/输出
+    // Connect to standard input/output
     const transport = new StdioServerTransport();
     this.server.connect(transport).catch(err => {
-      console.error('连接MCP传输错误:', err);
+      console.error('MCP transport connection error:', err);
     });
   }
 
   /**
-   * 注册所有MCP工具
+   * Register all MCP tools
    */
   private registerTools(): void {
-    // 下载文件
+    // Download file
     this.server.tool(
       "downloadFile",
       {
@@ -60,7 +60,7 @@ export class DownloadMCP {
           return {
             content: [{
               type: "text",
-              text: `下载失败: ${error instanceof Error ? error.message : String(error)}`
+              text: `Download failed: ${error instanceof Error ? error.message : String(error)}`
             }],
             isError: true
           };
@@ -68,7 +68,7 @@ export class DownloadMCP {
       }
     );
 
-    // 获取所有下载任务
+    // Get all download tasks
     this.server.tool(
       "listDownloads",
       {},
@@ -79,13 +79,13 @@ export class DownloadMCP {
             type: "text",
             text: tasks.length > 0 
               ? tasks.map(task => this.formatTaskToString(task)).join('\n\n')
-              : "当前没有下载任务"
+              : "No download tasks currently"
           }]
         };
       }
     );
 
-    // 获取指定下载任务
+    // Get specified download task
     this.server.tool(
       "getDownload",
       {
@@ -97,7 +97,7 @@ export class DownloadMCP {
           return {
             content: [{
               type: "text",
-              text: "任务不存在"
+              text: "Task does not exist"
             }],
             isError: true
           };
