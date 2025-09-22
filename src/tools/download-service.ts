@@ -224,7 +224,7 @@ export class DownloadService {
    * Start download task
    */
   async startDownload(url: string, filename?: string, savePath?: string, options?: DownloadOptions): Promise<DownloadTask> {
-    // 合并选项
+    // Merge options
     const downloadOptions = { ...this.defaultOptions, ...options };
     
     // Validate save path
@@ -357,20 +357,20 @@ export class DownloadService {
         task.status = DownloadStatus.CANCELLED;
         task.error = 'Download cancelled';
       } else {
-        // 处理其他错误，尝试重试
-        console.error(`下载错误 (${task.url}):`, err);
+        // Handling other errors, trying to retry
+        console.error(`Download error (${task.url}):`, err);
         
         if (task.retryCount < (options.maxRetries || 3)) {
           task.retryCount++;
-          task.error = `重试 ${task.retryCount}/${options.maxRetries || 3}: ${err.message}`;
+          task.error = `Retry ${task.retryCount}/${options.maxRetries || 3}: ${err.message}`;
           
-          // 延迟后重试
+          // Retrying after delay
           await new Promise(resolve => {
             setTimeout(resolve, options.retryDelay || 1000);
           });
           return this.executeDownload(task, options);
         } else {
-          // 已达到最大重试次数
+          // Maximum number of retries reached
           task.status = DownloadStatus.FAILED;
           task.error = err instanceof Error ? err.message : String(err);
         }
@@ -378,7 +378,7 @@ export class DownloadService {
       
       task.endTime = new Date();
       
-      // 如果是持久化任务且失败或取消，从持久化集合中移除
+      // If it is a persistent task and it fails or is canceled, remove it from the persistent set
       if (this.persistentTasks.has(task.id) && 
          (task.status === DownloadStatus.FAILED || task.status === DownloadStatus.CANCELLED)) {
         this.persistentTasks.delete(task.id);
@@ -388,14 +388,14 @@ export class DownloadService {
   }
 
   /**
-   * 单线程下载
+   * Single-threaded download
    */
   private async executeSingleThreadDownload(task: DownloadTask, filePath: string): Promise<void> {
-    // 设置请求信号
+    // Set request signal
     const controller = task.abortController!;
     const signal = controller.signal;
     
-    // 使用node-fetch发起请求
+    // Use node-fetch to initiate the request
     const response = await fetch(task.url, { 
       signal,
       headers: {
@@ -403,29 +403,29 @@ export class DownloadService {
       }
     });
     
-    // 检查响应状态
+    // Check response status
     if (!response.ok) {
-      throw new Error(`服务器返回状态码: ${response.status} ${response.statusText}`);
+      throw new Error(`Server returned status code: ${response.status} ${response.statusText}`);
     }
     
-    // 获取文件大小
+    // Get file size
     const contentLength = response.headers.get('content-length');
     if (contentLength) {
       task.totalSize = parseInt(contentLength, 10);
     }
     
-    // 创建写入流
+    // Create write stream
     const writeStream = fs.createWriteStream(filePath);
     
-    // 创建进度监控
+    // Create progress monitor
     let downloadedBytes = 0;
     
-    // 创建进度转换流
+    // Create progress transform stream
     const progressStream = new Transform({
       transform(chunk: Buffer, encoding: string, callback: Function) {
         downloadedBytes += chunk.length;
         
-        // 更新下载进度
+        // Update download progress
         task.downloadedSize = downloadedBytes;
         if (task.totalSize) {
           task.progress = Math.round((downloadedBytes / task.totalSize) * 100);
@@ -436,19 +436,19 @@ export class DownloadService {
       }
     });
     
-    // 使用 pipeline 连接流，更可靠的流处理
+    // Use pipeline to connect streams for more reliable stream processing
     if (response.body) {
       await pipeline(response.body, progressStream, writeStream);
     } else {
-      throw new Error('响应体为空');
+      throw new Error('Response body is empty');
     }
   }
 
   /**
-   * 多线程下载
+   * Multi-threaded download
    */
   private async executeMultiThreadDownload(task: DownloadTask, filePath: string, contentLength: number, threadCount: number): Promise<void> {
-    // 计算每个线程下载的字节范围
+    // Calculate the byte range for each thread to download
     const chunkSize = Math.floor(contentLength / threadCount);
     const segments: DownloadSegment[] = [];
     
@@ -466,21 +466,21 @@ export class DownloadService {
     
     task.segments = segments;
     
-    // 创建临时文件以存储每个段
+    // Create temporary files to store each segment
     const tempFiles = segments.map((_, index) => `${filePath}.part${index}`);
     
-    // 创建所有分段下载的Promise
-    const downloadPromises = segments.map((segment, index) => 
+    // Create Promises for all segment downloads
+    const downloadPromises = segments.map((segment, index) =>
       this.downloadSegment(task, segment, tempFiles[index])
     );
     
-    // 等待所有分段下载完成
+    // Wait for all segment downloads to complete
     await Promise.all(downloadPromises);
     
-    // 合并所有分段
+    // Merge all segments
     await this.mergeSegments(filePath, tempFiles);
     
-    // 删除临时文件
+    // Delete temporary files
     for (const tempFile of tempFiles) {
       if (fs.existsSync(tempFile)) {
         fs.unlinkSync(tempFile);
@@ -489,10 +489,10 @@ export class DownloadService {
   }
 
   /**
-   * 下载单个分段
+   * Download a single segment
    */
   private async downloadSegment(task: DownloadTask, segment: DownloadSegment, tempFile: string): Promise<void> {
-    // 跳过已经完成的段
+    // Skip completed segments
     if (segment.status === DownloadStatus.COMPLETED) {
       return;
     }
@@ -500,7 +500,7 @@ export class DownloadService {
     segment.status = DownloadStatus.DOWNLOADING;
     
     try {
-      // 设置断点续传的范围
+      // Set the range for resumable download
       const response = await fetch(task.url, {
         headers: {
           'Range': `bytes=${segment.start + segment.downloaded}-${segment.end}`,
@@ -508,28 +508,28 @@ export class DownloadService {
         }
       });
       
-      // 检查响应状态
+      // Check response status
       if (!response.ok && response.status !== 206) {
-        throw new Error(`服务器返回状态码: ${response.status} ${response.statusText}`);
+        throw new Error(`Server returned status code: ${response.status} ${response.statusText}`);
       }
       
-      // 创建写入流，如果是续传则追加内容
+      // Create a write stream, append content if it's a resume
       const writeStream = fs.createWriteStream(tempFile, { 
         flags: segment.downloaded > 0 ? 'a' : 'w' 
       });
       
-      // 创建进度监控
+      // Create progress monitor
       let segmentDownloadedBytes = 0;
       
-      // 创建进度转换流
+      // Create progress transform stream
       const progressStream = new Transform({
         transform(chunk: Buffer, encoding: string, callback: Function) {
           segmentDownloadedBytes += chunk.length;
-          
-          // 更新段的下载进度
+
+          // Update segment download progress
           segment.downloaded += chunk.length;
-          
-          // 更新总下载进度
+
+          // Update total download progress
           task.downloadedSize = (task.segments || [])
             .reduce((total, seg) => total + seg.downloaded, 0);
           
@@ -542,11 +542,11 @@ export class DownloadService {
         }
       });
       
-      // 使用 pipeline 连接流
+      // Use pipeline to connect streams
       if (response.body) {
         await pipeline(response.body, progressStream, writeStream);
       } else {
-        throw new Error('响应体为空');
+        throw new Error('Response body is empty');
       }
       
       segment.status = DownloadStatus.COMPLETED;
@@ -558,14 +558,14 @@ export class DownloadService {
   }
 
   /**
-   * 合并所有分段
+   * Merge all segments
    */
   private async mergeSegments(targetFile: string, tempFiles: string[]): Promise<void> {
     const writeStream = fs.createWriteStream(targetFile);
     
     for (const tempFile of tempFiles) {
       if (!fs.existsSync(tempFile)) {
-        throw new Error(`临时文件 ${tempFile} 不存在`);
+        throw new Error(`Temporary file ${tempFile} does not exist`);
       }
       
       const readStream = fs.createReadStream(tempFile);
@@ -580,21 +580,21 @@ export class DownloadService {
   }
 
   /**
-   * 获取所有下载任务
+   * Get all download tasks
    */
   getAllTasks(): DownloadTask[] {
     return Array.from(this.tasks.values());
   }
 
   /**
-   * 获取指定任务
+   * Get a specific task
    */
   getTask(taskId: string): DownloadTask | undefined {
     return this.tasks.get(taskId);
   }
 
   /**
-   * 暂停下载任务
+   * Pause download task
    */
   pauseTask(taskId: string): boolean {
     const task = this.tasks.get(taskId);
@@ -602,14 +602,14 @@ export class DownloadService {
       return false;
     }
     
-    // 取消当前的下载，但保留任务状态
+    // Cancel the current download, but keep the task state
     if (task.abortController) {
       task.abortController.abort();
     }
     
     task.status = DownloadStatus.PAUSED;
     
-    // 如果是持久化任务，更新持久化状态
+    // If it is a persistent task, update the persistent state
     if (this.persistentTasks.has(taskId)) {
       this.savePersistentTasks();
     }
@@ -618,7 +618,7 @@ export class DownloadService {
   }
 
   /**
-   * 恢复下载任务
+   * Resume download task
    */
   resumeTask(taskId: string, options?: DownloadOptions): boolean {
     const task = this.tasks.get(taskId);
@@ -626,26 +626,26 @@ export class DownloadService {
       return false;
     }
     
-    // 创建新的中止控制器
+    // Create a new abort controller
     task.abortController = new AbortController();
     
-    // 合并选项
+    // Merge options
     const downloadOptions = { 
       ...this.defaultOptions, 
       ...options,
-      isBlocking: false, // 恢复下载总是非阻塞的
+      isBlocking: false, // Resuming download is always non-blocking
     };
     
-    // 恢复下载
+    // Resume download
     this.executeDownload(task, downloadOptions).catch(err => {
-      console.error(`恢复下载任务执行错误: ${err.message}`);
+      console.error(`Error executing resume download task: ${err.message}`);
     });
     
     return true;
   }
 
   /**
-   * 取消下载任务
+   * Cancel download task
    */
   cancelTask(taskId: string): boolean {
     const task = this.tasks.get(taskId);
@@ -671,37 +671,37 @@ export class DownloadService {
   }
   
   /**
-   * 从URL中获取文件名
+   * Get filename from URL
    */
   private getFilenameFromUrl(url: string): string {
     try {
       const parsedUrl = new URL(url);
       let pathname = parsedUrl.pathname;
       
-      // 删除查询参数
+      // Remove query parameters
       pathname = pathname.split('?')[0];
       
-      // 获取路径的最后一部分
+      // Get the last part of the path
       const segments = pathname.split('/');
       let filename = segments[segments.length - 1];
       
-      // 如果文件名为空，生成随机文件名
+      // If the filename is empty, generate a random filename
       if (!filename) {
         filename = `download_${Date.now()}.bin`;
       }
       
-      // 如果文件名包含非法字符，替换它们
+      // If the filename contains illegal characters, replace them
       filename = filename.replace(/[/\\?%*:|"<>]/g, '_');
       
       return filename;
     } catch (error) {
-      // URL解析失败，返回默认文件名
+      // URL parsing failed, returning default filename
       return `download_${Date.now()}.bin`;
     }
   }
   
   /**
-   * 格式化速度
+   * Format speed
    */
   formatSpeed(bytesPerSecond: number): string {
     const units = ['B/s', 'KB/s', 'MB/s', 'GB/s'];
@@ -717,7 +717,7 @@ export class DownloadService {
   }
   
   /**
-   * 清理已完成的任务
+   * Clean up completed tasks
    */
   cleanCompletedTasks(): void {
     const completedStatuses = [
@@ -728,7 +728,7 @@ export class DownloadService {
     
     for (const [taskId, task] of this.tasks.entries()) {
       if (completedStatuses.includes(task.status)) {
-        // 从持久化集合中移除
+        // Remove from the persistent set
         if (this.persistentTasks.has(taskId)) {
           this.persistentTasks.delete(taskId);
         }
@@ -737,18 +737,18 @@ export class DownloadService {
       }
     }
     
-    // 更新持久化任务状态
+    // Update persistent task state
     this.savePersistentTasks();
   }
   
   /**
-   * 关闭服务
+   * Close service
    */
   close(): void {
-    // 停止速度计算器
+    // Stop speed calculator
     this.stopSpeedCalculator();
     
-    // 保存持久化任务状态
+    // Save persistent task state
     this.savePersistentTasks();
   }
 } 

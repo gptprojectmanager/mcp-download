@@ -111,7 +111,7 @@ export class DownloadMCP {
       }
     );
 
-    // 暂停下载任务
+    // Pause download task
     this.server.tool(
       "pauseDownload",
       {
@@ -122,14 +122,14 @@ export class DownloadMCP {
         return {
           content: [{
             type: "text",
-            text: success ? "任务已暂停" : "任务暂停失败或任务不存在"
+            text: success ? "Task paused" : "Failed to pause task or task does not exist"
           }],
           isError: !success
         };
       }
     );
 
-    // 恢复下载任务
+    // Resume download task
     this.server.tool(
       "resumeDownload",
       {
@@ -141,14 +141,14 @@ export class DownloadMCP {
         return {
           content: [{
             type: "text",
-            text: success ? "任务已恢复" : "任务恢复失败或任务不存在"
+            text: success ? "Task resumed" : "Failed to resume task or task does not exist"
           }],
           isError: !success
         };
       }
     );
 
-    // 取消下载任务
+    // Cancel download task
     this.server.tool(
       "cancelDownload",
       {
@@ -159,14 +159,14 @@ export class DownloadMCP {
         return {
           content: [{
             type: "text",
-            text: success ? "任务已取消" : "任务取消失败或任务不存在"
+            text: success ? "Task cancelled" : "Failed to cancel task or task does not exist"
           }],
           isError: !success
         };
       }
     );
 
-    // 清理已完成的任务
+    // Clean up completed tasks
     this.server.tool(
       "cleanCompletedDownloads",
       {},
@@ -175,7 +175,7 @@ export class DownloadMCP {
         return {
           content: [{
             type: "text",
-            text: "已清理完成的任务"
+            text: "Completed tasks have been cleaned up"
           }]
         };
       }
@@ -183,7 +183,7 @@ export class DownloadMCP {
   }
 
   /**
-   * 格式化任务为人类可读字符串
+   * Format task into a human-readable string
    */
   private formatTaskToString(task: DownloadTask): string {
     const statusText = this.getStatusText(task.status);
@@ -193,61 +193,61 @@ export class DownloadMCP {
     const durationText = this.formatDuration(task.startTime, task.endTime);
     const speedText = task.speed > 0 
       ? this.formatSpeed(task.speed)
-      : "等待中";
+      : "Waiting";
 
-    // 基本信息
+    // Basic Information
     let text = [
-      `任务ID: ${task.id}`,
-      `文件名: ${task.filename}`,
-      `保存路径: ${task.savePath}`,
-      `状态: ${statusText}`,
-      `进度: ${task.progress}%`,
-      `大小: ${sizeText}`,
-      `速度: ${speedText}`,
-      `用时: ${durationText}`
+      `Task ID: ${task.id}`,
+      `File Name: ${task.filename}`,
+      `Save Path: ${task.savePath}`,
+      `Status: ${statusText}`,
+      `Progress: ${task.progress}%`,
+      `Size: ${sizeText}`,
+      `Speed: ${speedText}`,
+      `Time Elapsed: ${durationText}`
     ];
     
-    // 附加信息（如果有）
+    // Additional Information (if any)
     if (task.segments) {
-      text.push(`线程数: ${task.segments.length}`);
+      text.push(`Threads: ${task.segments.length}`);
     }
     
     if (task.isBlocking !== undefined || task.isPersistent !== undefined) {
       const modeText = [];
       if (task.isBlocking !== undefined) {
-        modeText.push(task.isBlocking ? '阻塞' : '非阻塞');
+        modeText.push(task.isBlocking ? 'Blocking' : 'Non-blocking');
       }
       if (task.isPersistent !== undefined) {
-        modeText.push(task.isPersistent ? '持久化' : '非持久化');
+        modeText.push(task.isPersistent ? 'Persistent' : 'Non-persistent');
       }
-      text.push(`模式: ${modeText.join(', ')}`);
+      text.push(`Mode: ${modeText.join(', ')}`);
     }
     
-    // 错误信息（如果有）
+    // Error Information (if any)
     if (task.error) {
-      text.push(`错误: ${task.error}`);
+      text.push(`Error: ${task.error}`);
     }
     
     return text.join('\n');
   }
 
   /**
-   * 获取状态文本
+   * Get status text
    */
   private getStatusText(status: DownloadStatus): string {
     const statusMap = {
-      [DownloadStatus.PENDING]: '等待中',
-      [DownloadStatus.DOWNLOADING]: '下载中',
-      [DownloadStatus.COMPLETED]: '已完成',
-      [DownloadStatus.FAILED]: '失败',
-      [DownloadStatus.CANCELLED]: '已取消',
-      [DownloadStatus.PAUSED]: '已暂停'
+      [DownloadStatus.PENDING]: 'Waiting',
+      [DownloadStatus.DOWNLOADING]: 'Downloading',
+      [DownloadStatus.COMPLETED]: 'Completed',
+      [DownloadStatus.FAILED]: 'Failed',
+      [DownloadStatus.CANCELLED]: 'Cancelled',
+      [DownloadStatus.PAUSED]: 'Paused'
     };
     return statusMap[status];
   }
 
   /**
-   * 格式化文件大小
+   * Format file size
    */
   private formatSize(bytes: number): string {
     const units = ['B', 'KB', 'MB', 'GB', 'TB'];
@@ -263,7 +263,7 @@ export class DownloadMCP {
   }
 
   /**
-   * 格式化速度
+   * Format speed
    */
   private formatSpeed(bytesPerSecond: number): string {
     const units = ['B/s', 'KB/s', 'MB/s', 'GB/s'];
@@ -279,7 +279,7 @@ export class DownloadMCP {
   }
 
   /**
-   * 格式化持续时间
+   * Format duration
    */
   private formatDuration(startTime: Date, endTime?: Date): string {
     if (!endTime) {
@@ -291,7 +291,7 @@ export class DownloadMCP {
   }
 
   /**
-   * 格式化时间
+   * Format time
    */
   private formatTime(ms: number): string {
     const seconds = Math.floor(ms / 1000);
@@ -299,19 +299,19 @@ export class DownloadMCP {
     const hours = Math.floor(minutes / 60);
     
     if (hours > 0) {
-      return `${hours}小时${minutes % 60}分钟`;
+      return `${hours} hours ${minutes % 60} minutes`;
     }
     if (minutes > 0) {
-      return `${minutes}分钟${seconds % 60}秒`;
+      return `${minutes} minutes ${seconds % 60} seconds`;
     }
-    return `${seconds}秒`;
+    return `${seconds} seconds`;
   }
 
   /**
-   * 关闭服务
+   * Shutdown service
    */
   async close(): Promise<void> {
-    // 清理资源
+    // Clean up resources
     this.downloadService.close();
   }
 } 

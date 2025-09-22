@@ -2,8 +2,7 @@ import sys
 import os
 import subprocess
 import signal
-
-CREATE_NO_WINDOW = 0x08000000
+import platform
 
 proc = None
 
@@ -26,19 +25,26 @@ def main():
     signal.signal(signal.SIGTERM, handle_termination)
 
     try:
-        # 获取当前脚本所在目录
+        # Get the directory where the current script is located
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        # 构建 dist/index.js 的路径
+        # Build the path to dist/index.js
         index_js_path = os.path.join(current_dir, 'dist', 'index.js')
-        
+
+        popen_kwargs = {
+            "stdin": sys.stdin,
+            "stdout": sys.stdout,
+            "stderr": sys.stderr,
+            "shell": True,
+            "env": os.environ,
+        }
+
+        # Add creationflags only on Windows
+        if platform.system() == "Windows":
+            popen_kwargs["creationflags"] = 0x08000000
+
         proc = subprocess.Popen(
             f"node {index_js_path}",
-            stdin=sys.stdin,
-            stdout=sys.stdout,
-            stderr=sys.stderr,
-            shell=True,
-            env=os.environ,
-            creationflags=CREATE_NO_WINDOW
+            **popen_kwargs
         )
 
         proc.wait()

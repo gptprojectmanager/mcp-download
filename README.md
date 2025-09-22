@@ -5,7 +5,6 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-8338ec?style=flat-square)](https://www.typescriptlang.org/)
 [![Download](https://img.shields.io/badge/Download-MCP-fb5607?style=flat-square)](https://github.com/shuakami/mcp-download)
 
-[English Version (README-EN.md)](README-EN.md)
 
 ## What is this
 
@@ -42,38 +41,38 @@ Through simple natural language commands, AI can help you complete all the above
 
 ## Quick Start
 
-### 0. 环境准备
+### 0. Environment Setup
 
 <details>
-<summary>如果你之前没有使用过 Node.js (点击展开)</summary>
+<summary>If you have not used Node.js before (Click to expand)</summary>
 
-1. 安装 Node.js 和 npm
-   - 访问 [Node.js 官网](https://nodejs.org/)
-   - 下载并安装 LTS（长期支持）版本
-   - 安装时选择默认选项即可，安装包会同时安装 Node.js 和 npm
+1. Install Node.js and npm
+   - Visit the [Node.js official website](https://nodejs.org/)
+   - Download and install the LTS (Long-Term Support) version
+   - Select the default options during installation. The installer will install both Node.js and npm.
 
-2. 验证安装
-   - 安装完成后，打开命令提示符（CMD）或 PowerShell
-   - 输入以下命令确认安装成功：
+2. Verify Installation
+   - After installation is complete, open Command Prompt (CMD) or PowerShell
+   - Enter the following commands to confirm a successful installation:
      ```bash
      node --version
      npm --version
      ```
-   - 如果显示版本号，则表示安装成功
+   - If the version numbers are displayed, the installation was successful
 
-3. 安装 Git（如果尚未安装）
-   - 访问 [Git 官网](https://git-scm.com/)
-   - 下载并安装 Git
-   - 安装时使用默认选项即可
+3. Install Git (if not already installed)
+   - Visit the [Git official website](https://git-scm.com/)
+   - Download and install Git
+   - Use the default options during installation
 
-4. 安装 Python 3.11 或更高版本（必需）
-   - 访问 [Python 官网](https://www.python.org/downloads/)
-   - 下载并安装 Python 3.11 或更高版本
-   - **重要**：安装时必须勾选"Add Python to PATH"选项
-   - 安装完成后**重启电脑**，确保环境变量生效
+4. Install Python 3.11 or higher (required)
+   - Visit the [Python official website](https://www.python.org/downloads/)
+   - Download and install Python 3.11 or a higher version
+   - **Important**: You must check the "Add Python to PATH" option during installation
+   - After installation, **restart your computer** to ensure the environment variables take effect
 </details>
 
-### 1. 克隆并安装
+### 1. Clone and Install
 
 ```bash
 git clone https://github.com/shuakami/mcp-download.git
@@ -82,21 +81,21 @@ npm install
 npm run build
 ```
 
-### 2. 构建项目
+### 2. Build the Project
 
 ```bash
 npm run build
 ```
 
-### 3. 添加到 Cursor MCP 配置
+### 3. Add to Cursor MCP Configuration
 
-根据你的操作系统，按照以下步骤配置 MCP：
+Follow the steps below to configure MCP according to your operating system:
 
 <details>
-<summary><b>Windows 配置</b> (点击展开)</summary>
+<summary><b>Windows Configuration</b> (Click to expand)</summary>
 
-1. 在 Cursor 中，打开或创建 MCP 配置文件：`C:\\Users\\你的用户名\\.cursor\\mcp.json`
-   - 注意：请将 `你的用户名` 替换为你的 Windows 用户名
+1. In Cursor, open or create the MCP configuration file: `C:\\Users\\your_username\\.cursor\\mcp.json`
+   - Note: Please replace `your_username` with your Windows username
 
 2. 添加或修改配置如下：
 
@@ -113,18 +112,18 @@ npm run build
 }
 ```
 
-> ⚠️ **请注意**:
-> - 将 `你的用户名` 替换为你的 Windows 用户名
-> - 确保路径正确指向你克隆或解压的项目目录
-> - 路径应该反映你将项目文件放置的实际位置
-> - **不要删除克隆或解压的文件夹**，这会导致 MCP 无法正常工作
+> ⚠️ **Please note**:
+> - Replace `your_username` with your Windows username
+> - Ensure the path correctly points to the directory where you cloned or unzipped the project
+> - The path should reflect the actual location where you placed the project files
+> - **Do not delete the cloned or unzipped folder**, as this will prevent MCP from working correctly
 </details>
 
 <details>
-<summary><b>macOS 配置</b> (点击展开)</summary>
+<summary><b>macOS Configuration</b> (Click to expand)</summary>
 
-1. 在 Cursor 中，打开或创建 MCP 配置文件：`/Users/你的用户名/.cursor/mcp.json`
-   - 注意：请将 `你的用户名` 替换为你的 macOS 用户名
+1. In Cursor, open or create the MCP configuration file: `/Users/your_username/.cursor/mcp.json`
+   - Note: Please replace `your_username` with your macOS username
 
 2. 添加或修改配置如下：
 
@@ -141,18 +140,18 @@ npm run build
 }
 ```
 
-> ⚠️ **请注意**:
-> - 将 `你的用户名` 替换为你的 macOS 用户名
-> - 确保路径正确指向你克隆或解压的项目目录
-> - 路径应该反映你将项目文件放置的实际位置
-> - **不要删除克隆或解压的文件夹**，这会导致 MCP 无法正常工作
+> ⚠️ **Please note**:
+> - Replace `your_username` with your macOS username
+> - Ensure the path correctly points to the directory where you cloned or unzipped the project
+> - The path should reflect the actual location where you placed the project files
+> - **Do not delete the cloned or unzipped folder**, as this will prevent MCP from working correctly
 </details>
 
 <details>
-<summary><b>Linux 配置</b> (点击展开)</summary>
+<summary><b>Linux Configuration</b> (Click to expand)</summary>
 
-1. 在 Cursor 中，打开或创建 MCP 配置文件：`/home/你的用户名/.cursor/mcp.json`
-   - 注意：请将 `你的用户名` 替换为你的 Linux 用户名
+1. In Cursor, open or create the MCP configuration file: `/home/your_username/.cursor/mcp.json`
+   - Note: Please replace `your_username` with your Linux username
 
 2. 添加或修改配置如下：
 
@@ -169,58 +168,58 @@ npm run build
 }
 ```
 
-> ⚠️ **请注意**:
-> - 将 `你的用户名` 替换为你的 Linux 用户名
-> - 确保路径正确指向你克隆或解压的项目目录
-> - 路径应该反映你将项目文件放置的实际位置
-> - **不要删除克隆或解压的文件夹**，这会导致 MCP 无法正常工作
+> ⚠️ **Please note**:
+> - Replace `your_username` with your Linux username
+> - Ensure the path correctly points to the directory where you cloned or unzipped the project
+> - The path should reflect the actual location where you placed the project files
+> - **Do not delete the cloned or unzipped folder**, as this will prevent MCP from working correctly
 </details>
 
-### 4. 启动服务
+### 4. Start the Service
 
-配置好之后，重启 Cursor 编辑器，它会自动启动 MCP 服务。然后你就可以开始使用了。
+Once configured, restart the Cursor editor, and it will automatically start the MCP service. You can then begin using it.
 
 <details>
-<summary>使用示例 (点击展开)</summary>
+<summary>Usage Examples (Click to expand)</summary>
 
-你可以要求 AI 执行以下操作：
-- "下载 https://nodejs.org/dist/v18.19.0/node-v18.19.0-x64.msi 到我的下载文件夹"
-- "显示当前的所有下载任务" 
-- "查看下载ID为abc123的下载状态"
-- "暂停当前的下载任务"
-- "恢复ID为abc123的下载，使用8个线程"
-- "取消正在进行的下载"
-- "清理所有已完成的下载任务"
+You can ask the AI to perform the following actions:
+- "Download https://nodejs.org/dist/v18.19.0/node-v18.19.0-x64.msi to my downloads folder"
+- "Show all current download tasks"
+- "Check the status of download ID abc123"
+- "Pause the current download task"
+- "Resume download ID abc123 using 8 threads"
+- "Cancel the ongoing download"
+- "Clear all completed download tasks"
 
-高级用法：
-- "使用32线程下载 https://dlcdn.apache.org/tomcat/tomcat-10/v10.1.19/bin/apache-tomcat-10.1.19.zip"
-- "以阻塞模式下载 https://dl.google.com/android/repository/platform-tools-latest-windows.zip"（等待下载完成后再继续）
-- "启动持久化下载 https://repo.anaconda.com/archive/Anaconda3-2023.09-0-Windows-x86_64.exe"（即使关闭前台程序也会继续下载）
+Advanced Usage:
+- "Use 32 threads to download https://dlcdn.apache.org/tomcat/tomcat-10/v10.1.19/bin/apache-tomcat-10.1.19.zip"
+- "Download https://dl.google.com/android/repository/platform-tools-latest-windows.zip in blocking mode" (waits for the download to complete before proceeding)
+- "Start a persistent download of https://repo.anaconda.com/archive/Anaconda3-2023.09-0-Windows-x86_64.exe" (continues downloading even if the foreground application is closed)
 </details>
 
-## 工作原理
+## How It Works
 
 <details>
-<summary>技术实现细节 (点击展开)</summary>
+<summary>Technical Implementation Details (Click to expand)</summary>
 
-本工具基于 **MCP (Model Context Protocol)** 标准实现，作为 AI 模型与文件下载服务之间的桥梁。它使用 **node-fetch** 作为底层下载客户端，并通过 **Zod** 进行请求验证和类型检查。
+This tool is implemented based on the **MCP (Model Context Protocol)** standard, acting as a bridge between the AI model and the file download service. It uses **node-fetch** as the underlying download client and **Zod** for request validation and type checking.
 
-主要技术组件包括：
-- **多线程下载管理器**：将大文件分割为多个段，并发下载，然后合并
-- **断点续传系统**：跟踪每个段的下载进度，支持中断后恢复
-- **持久化存储**：保存下载任务状态，即使程序重启也能恢复
-- **实时监控**：计算下载速度、预估剩余时间等关键指标
-- **灵活的工作模式**：支持阻塞/非阻塞、持久化/非持久化模式
+Key technical components include:
+- **Multi-threaded Download Manager**: Splits large files into multiple segments, downloads them concurrently, and then merges them.
+- **Resumable Download System**: Tracks the download progress of each segment, supporting recovery after interruption.
+- **Persistent Storage**: Saves the state of download tasks, allowing recovery even if the program restarts.
+- **Real-time Monitoring**: Calculates key metrics such as download speed and estimated remaining time.
+- **Flexible Operating Modes**: Supports blocking/non-blocking and persistent/non-persistent modes.
 
-每个下载操作都被封装为标准化的 MCP 工具，接收结构化参数并返回格式化结果。所有下载任务都作为独立进程管理，确保即使前台程序关闭，下载也能安全继续。
+Each download operation is encapsulated as a standardized MCP tool, receiving structured parameters and returning formatted results. All download tasks are managed as independent processes, ensuring that downloads can continue safely even if the foreground application is closed.
 
-这种设计使 AI 模型能够清晰地理解和处理下载状态，并以更自然的方式与用户沟通下载进度、速度和其他关键信息。
+This design enables the AI model to clearly understand and handle download statuses, and to communicate progress, speed, and other key information to the user in a more natural way.
 </details>
 
-## 许可证
+## License
 
 ISC
 
 ---
 
-如果这个项目对你有帮助，欢迎给个 Star ⭐️ (｡♥‿♥｡)
+If you find this project helpful, please give it a Star ⭐️ (｡♥‿♥｡)
